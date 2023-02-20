@@ -24,6 +24,5 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-    Route::post('/upload/search-terms', [App\Http\Controllers\SearchTermController::class, 'upload'])->name('upload.search.terms');
-    Route::get('/search', [App\Http\Controllers\SearchTermController::class, 'index'])->name('search');
+    Route::get('/search-stats', [App\Http\Controllers\SearchStatController::class, 'index'])->name('search-stats');
 });
