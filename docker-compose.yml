@@ -20,7 +20,7 @@ services:
         volumes:
             - '.:/var/www/html'
         networks:
-            - sail
+            - fleet-searcher
         depends_on:
             - pgsql
             - chromedriver
@@ -34,10 +34,10 @@ services:
             POSTGRES_USER: '${DB_USERNAME}'
             POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
         volumes:
-            - 'sail-pgsql:/var/lib/postgresql/data'
+            - 'fleet-searcher-pgsql:/var/lib/postgresql/data'
             - './vendor/laravel/sail/database/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql'
         networks:
-            - sail
+            - fleet-searcher
         healthcheck:
             test:
                 - CMD
@@ -55,11 +55,11 @@ services:
             - "4444:4444"
             - "5900:5900"
         networks:
-            - sail
+            - fleet-searcher
 networks:
-    sail:
+    fleet-searcher:
         driver: bridge
 volumes:
-    sail-pgsql:
+    fleet-searcher-pgsql:
         driver: local
 
