@@ -32,7 +32,6 @@ class CsvParser implements FileInputParser
 
         if ($handle !== false) {
             while (($data = fgetcsv($handle, 1000, ',')) !== false) {
-
                 foreach ($data as $keyword) {
                     $keyword = trim($keyword);
                     if (empty($keyword)) {
@@ -54,5 +53,4 @@ class CsvParser implements FileInputParser
 
         return $keywords;
     }
-
 }
