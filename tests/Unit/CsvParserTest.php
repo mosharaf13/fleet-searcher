@@ -53,4 +53,14 @@ class CsvParserTest extends TestCase
 
         $this->parser->parse($file);
     }
+
+    public function test_it_ignores_empty_keywords()
+    {
+
+        $file = new UploadedFile(__DIR__ . '/files/valid_with_empty_keyword.csv', 'valid_with_empty_keyword.csv');
+
+        $result = $this->parser->parse($file);
+
+        $this->assertEquals(['apple', 'banana', 'pear'], $result);
+    }
 }
