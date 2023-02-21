@@ -9,6 +9,15 @@ use Illuminate\Http\UploadedFile;
 
 class CsvParser implements FileInputParser
 {
+    private $keywordMaxLength;
+    private $maxNumberOfKeywords;
+
+    public function __construct()
+    {
+        $this->keywordMaxLength = 512;
+        $this->maxNumberOfKeywords = 100;
+    }
+
     /**
      * @param UploadedFile $file
      * @return array|string []
@@ -23,12 +32,14 @@ class CsvParser implements FileInputParser
 
         if ($handle !== false) {
             while (($data = fgetcsv($handle, 1000, ',')) !== false) {
+
                 foreach ($data as $keyword) {
-                    if (!(is_string($keyword) && strlen($keyword) <= 255)) {
-                        throw new InvalidKeywordException("Each keyword must be a valid string and less than 512 characters in length");
-                    }
-                    if (empty(trim($keyword))) {
+                    $keyword = trim($keyword);
+                    if (empty($keyword)) {
                         continue;
+                    }
+                    if (strlen($keyword) > $this->keywordMaxLength) {
+                        throw new InvalidKeywordException("Each keyword must be less than or equal to 512 characters in length");
                     }
                     $keywords[] = $keyword;
                 }
@@ -37,10 +48,11 @@ class CsvParser implements FileInputParser
             fclose($handle);
         }
 
-        if (count($keywords) > 100) {
-            throw new TooManyKeywordsException('CSV file must contain less than 100 keywords');
+        if (count($keywords) > $this->maxNumberOfKeywords) {
+            throw new TooManyKeywordsException('CSV file must contain less than or equal to 100 keywords');
         }
 
         return $keywords;
     }
+
 }
