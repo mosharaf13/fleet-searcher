@@ -4,13 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Browser;
 use App\Contracts\FileInputParser;
+use App\Contracts\Searcher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class SearcherController extends Controller
 {
-    public function __construct(private FileInputParser $fileInputParser, private Browser $browser)
-    {
+    public function __construct(
+        private FileInputParser $fileInputParser,
+        private Browser $browser,
+        private Searcher $searcher
+    ) {
     }
 
     /**
@@ -30,9 +34,9 @@ class SearcherController extends Controller
 
         $keywords = $this->fileInputParser->parse($request->file('keywords'));
 
-        foreach (array_chunk($keywords, 10) as $chunk){
+        foreach (array_chunk($keywords, 10) as $keywordsChunk) {
             $driver = $this->browser->getDriver();
-            sleep(5);
+            $this->searcher->search($driver, $keywordsChunk);
             $driver->quit();
         }
         return $keywords;
