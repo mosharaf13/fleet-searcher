@@ -2,7 +2,21 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-12">
-                <div class="card">
+                <div class="card my-2">
+                    <div class="card-header">
+                        Upload a CSV file containing keywords. Maximum 100 keywords allowed.
+                        <!-- Add instructions regarding the structure of the CSV file-->
+                    </div>
+                    <div class="card-body">
+                        <div class="my-4">
+                            <form @submit.prevent="submitForm">
+                                <input type="file" accept=".csv" @change="onFileChange"/>
+                                <button type="submit" :disabled="!canSubmit">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="card my-2">
                     <div class="card-header">Search Stats</div>
                     <div class="card-body">
                         <table class="table">
@@ -53,6 +67,7 @@ export default {
     setup() {
         let keyword = ref('');
         let searchStats = ref([]);
+        let fileInput = ref(null);
         const url = '/search-stats';
 
         onMounted(() => {
@@ -69,10 +84,35 @@ export default {
             }
         };
 
+        function submitForm() {
+            const formData = new FormData();
+            formData.append('keywords', fileInput.value);
+            axios.post('/keywords', formData)
+                .then(response => {
+                    console.log(response);
+                })
+                .catch(error => {
+                    // Handle any errors
+                    console.error(error);
+                });
+        }
+
+        const canSubmit = computed(() => {
+            return fileInput.value;
+        });
+
+        function onFileChange(event) {
+            fileInput.value = event.target.files[0];
+        }
+
         return {
             keyword,
             searchStats,
-            search
+            search,
+            submitForm,
+            canSubmit,
+            onFileChange,
+            fileInput
         };
     },
 
