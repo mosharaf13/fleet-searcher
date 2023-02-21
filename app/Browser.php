@@ -3,18 +3,15 @@
 namespace App;
 
 use App\Exceptions\ChromeDriverException;
-use Facebook\WebDriver\Chrome\ChromeDriver;
 use Facebook\WebDriver\Chrome\ChromeOptions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
-use Facebook\WebDriver\Remote\WebDriverCapabilityType;
 use Facebook\WebDriver\WebDriver;
 use Facebook\WebDriver\WebDriverCapabilities;
 use Illuminate\Support\Facades\Log;
 
 class Browser
 {
-    private WebDriver $driver;
     private WebDriverCapabilities $capabilities;
     private string $seleniumServerUrl;
 
@@ -41,13 +38,4 @@ class Browser
             throw new ChromeDriverException("Error while starting Chrome driver ", $exception);
         }
     }
-
-    /**
-     * @return void
-     */
-    public function quit()
-    {
-        $this->driver->quit();
-    }
-
 }
