@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\FileInputParser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class SearcherController extends Controller
 {
+    public function __construct(private FileInputParser $fileInputParser)
+    {
+    }
+
     public function upload(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -17,6 +22,6 @@ class SearcherController extends Controller
             return response()->json(['error' => $validator->errors()], 400);
         }
 
-        return $request->file('keywords');
+        return $this->fileInputParser->parse($request->file('keywords'));
     }
 }
