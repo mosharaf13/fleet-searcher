@@ -17,6 +17,20 @@
                     </div>
                 </div>
                 <div class="card my-2">
+                    <div class="card-header">
+                        Search Keywords
+                    </div>
+                    <div class="card-body">
+                        <div class="input-group">
+                            <input type="text" v-model="keyword" class="form-control" placeholder="Enter a keyword"
+                                   aria-label="Enter a keyword" aria-describedby="button-search"
+                                   @keyup.enter="search(url)">
+                            <button @click="search(url)" class="btn btn-primary" type="button" id="button-search">Search
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card my-2">
                     <div class="card-header">Search Stats</div>
                     <div class="card-body">
                         <table class="table">
@@ -37,8 +51,10 @@
                                 <td class="text-center">{{ searchStat.ads_count }}</td>
                                 <td class="text-center">{{ searchStat.links_count }}</td>
                                 <td class="text-center">{{ searchStat.total_result_count }}</td>
-<!--                                <td>{{ searchStat.raw_response }}</td>-->
-                                <td><button type="button" class="btn btn-primary">View</button></td>
+                                <!--                                <td>{{ searchStat.raw_response }}</td>-->
+                                <td>
+                                    <button type="button" class="btn btn-primary">View</button>
+                                </td>
                             </tr>
                             </tbody>
                         </table>
@@ -62,6 +78,7 @@
 <script>
 import {ref, onMounted, computed} from 'vue';
 import axios from 'axios';
+
 export default {
     name: 'FleetSearch',
     setup() {
@@ -76,7 +93,9 @@ export default {
 
         const search = async (url) => {
             try {
-                const response = await axios.get(url, {keyword: keyword.value});
+                const response = await axios.get(url, {
+                    params: {keyword: keyword.value}
+                });
                 searchStats.value = response.data;
                 console.log(searchStats.value);
             } catch (error) {
@@ -106,6 +125,7 @@ export default {
         }
 
         return {
+            url,
             keyword,
             searchStats,
             search,
