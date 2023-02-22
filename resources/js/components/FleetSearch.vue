@@ -10,7 +10,8 @@
                     <div class="card-body">
                         <form @submit.prevent="submitForm" class="mb-3">
                             <div class="input-group mb-3">
-                                <input type="file" id="csvFile" class="form-control" accept=".csv" @change="onFileChange" />
+                                <input type="file" id="csvFile" class="form-control" accept=".csv"
+                                       @change="onFileChange"/>
                                 <button type="submit" :disabled="!canSubmit" class="btn btn-primary">Upload</button>
                             </div>
                         </form>
@@ -22,8 +23,12 @@
                     </div>
                     <div class="card-body">
                         <div class="input-group">
-                            <input type="text" v-model="keyword" class="form-control" placeholder="Enter a keyword" aria-label="Enter a keyword" aria-describedby="button-search" @keyup.enter="search(url)" />
-                            <button @click="search(url)" class="btn btn-primary" type="button" id="button-search">Search</button>
+                            <input type="text" v-model="keyword" class="form-control" placeholder="Enter a keyword"
+                                   aria-label="Enter a keyword" aria-describedby="button-search"
+                                   @keyup.enter="search(url)"/>
+                            <button @click="search(url)" class="btn btn-primary" type="button" id="button-search">
+                                Search
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -58,7 +63,8 @@
                             </table>
                             <nav aria-label="Page navigation" class="overflow-auto">
                                 <ul class="pagination justify-content-start flex-wrap">
-                                    <li class="page-item m-1" v-for="page in searchStats.links" :key="page.label" :class="{active: page.active}">
+                                    <li class="page-item m-1" v-for="page in searchStats.links" :key="page.label"
+                                        :class="{active: page.active}">
                                         <a class="page-link" @click.prevent="search(page.url)" href="#">
                                             <span v-html="page.label"></span>
                                         </a>
@@ -106,7 +112,7 @@ export default {
             formData.append('keywords', fileInput.value);
             axios.post('/keywords', formData)
                 .then(response => {
-                    console.log(response);
+                    search(url);
                 })
                 .catch(error => {
                     // Handle any errors
