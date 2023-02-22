@@ -34,10 +34,12 @@ class SearcherController extends Controller
         }
 
         $keywords = $this->fileInputParser->parse($request->file('keywords'));
+        $url = 'https://www.google.com/search?hl=en&q=';
 
         foreach (array_chunk($keywords, 10) as $keywordsChunk) {
+
             $driver = $this->browser->getDriver();
-            $this->searcher->search($driver, $keywordsChunk);
+            $this->searcher->search($url, $driver, $keywordsChunk);
             $driver->quit();
         }
         return response()->json("Keywords uploaded successfully");

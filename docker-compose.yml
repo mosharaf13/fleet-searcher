@@ -12,6 +12,7 @@ services:
         ports:
             - '${APP_PORT:-80}:80'
             - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
+            - "8800:8800"
         environment:
             WWWUSER: '${WWWUSER}'
             LARAVEL_SAIL: 1
@@ -54,6 +55,8 @@ services:
         ports:
             - "4444:4444"
             - "5900:5900"
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
         networks:
             - fleet-searcher
 networks:
@@ -62,4 +65,3 @@ networks:
 volumes:
     fleet-searcher-pgsql:
         driver: local
-
