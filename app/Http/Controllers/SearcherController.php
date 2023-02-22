@@ -12,9 +12,10 @@ class SearcherController extends Controller
 {
     public function __construct(
         private FileInputParser $fileInputParser,
-        private Browser $browser,
-        private Searcher $searcher
-    ) {
+        private Browser         $browser,
+        private Searcher        $searcher
+    )
+    {
     }
 
     /**
@@ -39,6 +40,6 @@ class SearcherController extends Controller
             $this->searcher->search($driver, $keywordsChunk);
             $driver->quit();
         }
-        return $keywords;
+        return response()->json("Keywords uploaded successfully");
     }
 }
