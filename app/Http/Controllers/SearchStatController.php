@@ -11,8 +11,14 @@ class SearchStatController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(SearchStat::orderBy('created_at', 'desc')->paginate(10));
+        $searchStat = SearchStat::query();
+
+        if ($request->has('keyword')) {
+            $searchStat->where('keyword', 'like', '%' . $request->get('keyword') . '%');
+        }
+
+        return response()->json($searchStat->orderBy('created_at', 'desc')->paginate(8));
     }
 }

@@ -6,3 +6,12 @@
 
 // Bootstrap
 @import 'bootstrap/scss/bootstrap';
+
+.card {
+    box-shadow: 0px 2px 6px rgba(52, 72, 84, 0.1);
+    border: none;
+}
+
+body {
+    background: #EAF4FA;
+}
