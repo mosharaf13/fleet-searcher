@@ -36,7 +36,7 @@
                         <table class="table">
                             <thead>
                             <tr>
-                                <th>Created At</th>
+                                <th>Searched On</th>
                                 <th>Keyword</th>
                                 <th class="text-center">Total Ads</th>
                                 <th class="text-center">Total Links</th>
