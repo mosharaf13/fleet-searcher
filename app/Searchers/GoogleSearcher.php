@@ -8,7 +8,6 @@ use App\Models\SearchStat;
 use Facebook\WebDriver\WebDriver;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverExpectedCondition;
-use Facebook\WebDriver\WebDriverKeys;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -22,12 +21,11 @@ class GoogleSearcher implements Searcher
      * @param array $keywords
      * @return void
      */
-    public function search(WebDriver $driver, array $keywords): void
+    public function search(string $url, WebDriver $driver, array $keywords): void
     {
         $this->driver = $driver;
-
         foreach ($keywords as $keyword) {
-            $this->performSearch($keyword);
+            $this->performSearch($url, $keyword);
 
             SearchStatGenerated::dispatch(
                 $keyword,
@@ -40,16 +38,10 @@ class GoogleSearcher implements Searcher
         }
     }
 
-    private function performSearch(string $keyword): void
+    private function performSearch(string $url, string $keyword): void
     {
-        $url = 'https://www.google.com/search?hl=en';
-        $this->driver->get($url);
+        $this->driver->get($url . urlencode($keyword));
 
-        $searchBox = $this->driver->wait()->until(
-            WebDriverExpectedCondition::visibilityOfElementLocated(WebDriverBy::name('q'))
-        );
-        $searchBox->sendKeys($keyword);
-        $searchBox->sendKeys(WebDriverKeys::ENTER);
         $this->driver->wait()->until(
             WebDriverExpectedCondition::visibilityOfElementLocated(WebDriverBy::id('result-stats'))
         );
