@@ -2,8 +2,8 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SearchStatController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SearcherController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,4 +24,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('keywords', [SearchStatController::class, 'keywords']);
     Route::get('search-stats', [SearchStatController::class, 'listStats']);
     Route::get('raw-response/{id}', [SearchStatController::class, 'rawResponse']);
+
+    Route::post('keywords', [SearcherController::class, 'upload']);
 });
