@@ -19,6 +19,6 @@ class SearchStatController extends Controller
             $searchStat->where('keyword', 'like', '%' . $request->get('keyword') . '%');
         }
 
-        return response()->json($searchStat->orderBy('created_at', 'desc')->paginate(10));
+        return response()->json($searchStat->orderBy('created_at', 'desc')->paginate(8));
     }
 }
