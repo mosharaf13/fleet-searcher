@@ -42,7 +42,7 @@ class GoogleSearcher implements Searcher
 
     private function performSearch(string $keyword): void
     {
-        $url = 'https://www.google.com/search?hl=en&q=' . urlencode($keyword);
+        $url = 'https://www.google.com/search?hl=en';
         $this->driver->get($url);
 
         $searchBox = $this->driver->wait()->until(
