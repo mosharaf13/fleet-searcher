@@ -3,11 +3,13 @@
 namespace App\Searchers;
 
 use App\Contracts\Searcher;
+use App\Events\SearchStatGenerated;
 use App\Models\SearchStat;
 use Facebook\WebDriver\WebDriver;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverExpectedCondition;
 use Facebook\WebDriver\WebDriverKeys;
+use Illuminate\Support\Facades\Log;
 
 class GoogleSearcher implements Searcher
 {
@@ -25,17 +27,14 @@ class GoogleSearcher implements Searcher
 
         foreach ($keywords as $keyword) {
             $this->performSearch($keyword);
-            $linksCount = $this->countLinks();
-            $adsCount = $this->countAds();
-            $searchCount = $this->extractTotalNumberOfResults();
 
-            SearchStat::create([
-                'keyword' => $keyword,
-                'ads_count' => $adsCount,
-                'links_count' => $linksCount,
-                'total_result_count' => $searchCount,
-                'raw_response' => $this->driver->getPageSource(),
-            ]);
+            SearchStatGenerated::dispatch(
+                $keyword,
+                $this->countAds(),
+                $this->countLinks(),
+                $this->extractTotalNumberOfResults(),
+                $this->getRawResponse()
+            );
         }
     }
 
@@ -85,5 +84,10 @@ class GoogleSearcher implements Searcher
         // Extract the number of search results and return the counts
         preg_match('/([\d,]+) result/', $searchCount, $matches);
         return str_replace(',', '', $matches[1]);
+    }
+
+    private function getRawResponse(): ?string
+    {
+        return $this->driver->getPageSource();
     }
 }
