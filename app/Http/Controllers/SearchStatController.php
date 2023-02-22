@@ -33,14 +33,32 @@ class SearchStatController extends Controller
     {
         $searchStat = SearchStat::query();
 
-        if ($request->has('keyword')) {
-            $searchStat->where('keyword', 'like', '%' . $request->get('keyword') . '%');
-        }
-
         return response()->json(
             $searchStat->select('keyword')
                 ->orderBy('created_at', 'desc')
                 ->paginate($this->paginationSize)
+        );
+    }
+
+    public function listStats(Request $request)
+    {
+        $searchStat = SearchStat::query();
+
+        if ($request->has('keyword')) {
+            $searchStat->where('keyword', $request->get('keyword'));
+        }
+
+        return response()->json(
+            $searchStat->select(SearchStat::MASS_RETURN_ATTRIBUTES)
+                ->orderBy('created_at', 'desc')
+                ->paginate($this->paginationSize)
+        );
+    }
+
+    public function rawResponse($id)
+    {
+        return response()->json(
+            SearchStat::findOrFail($id)->raw_response
         );
     }
 }
