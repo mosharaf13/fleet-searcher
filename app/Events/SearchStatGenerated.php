@@ -12,7 +12,8 @@ class SearchStatGenerated
                                 public int    $adsCount,
                                 public int    $linksCount,
                                 public float  $searchCount,
-                                public string $rawResponse)
+                                public string $rawResponse,
+                                public int    $user_id)
     {
     }
 }

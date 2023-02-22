@@ -9,6 +9,7 @@ use Facebook\WebDriver\WebDriver;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverExpectedCondition;
 use Facebook\WebDriver\WebDriverKeys;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class GoogleSearcher implements Searcher
@@ -33,7 +34,8 @@ class GoogleSearcher implements Searcher
                 $this->countAds(),
                 $this->countLinks(),
                 $this->extractTotalNumberOfResults(),
-                $this->getRawResponse()
+                $this->getRawResponse(),
+                Auth::id()
             );
         }
     }

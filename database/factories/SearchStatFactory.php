@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\SearchStat;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -30,6 +31,7 @@ class SearchStatFactory extends Factory
             'links_count' => fake()->numberBetween(0, 10),
             'total_result_count' => fake()->numberBetween(0, 10),
             'raw_response' => fake()->randomHtml,
+            'user_id' => 1
         ];
     }
 }
