@@ -54,7 +54,7 @@ You can run the automated tests for the application using PHPUnit. To run the te
 If you want generate code coverage then run
 
 ```bash
-vendor/bin/sail test --coverage-html ./coverage
+.vendor/bin/sail test --coverage-html ./coverage
 ```
 
 ### License
