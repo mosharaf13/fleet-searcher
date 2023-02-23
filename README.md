@@ -8,13 +8,15 @@ fleet-searcher is a web application that allows you to search google using a CSV
 
 - Docker and Docker Compose
 - Composer
+- PHP 8 with the following extensions: pdo, pdo_mysql, mbstring, tokenizer, xml, curl
+- Node.js and npm
 
 ### Installation
 
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/fleet-searcher.git
+git clone git@github.com:mosharaf13/fleet-searcher.git fleet-searcher
 ```
 
 2. Navigate to the project directory:
@@ -23,40 +25,24 @@ git clone https://github.com/your-username/fleet-searcher.git
 cd fleet-searcher
 ```
 
-3. Copy the .env.example file to .env:
-
+3. If you don't have the dependencies installed. Run the following command
 ```bash
-cp .env.example .env
+bash setup/install_dependencies.sh
 ```
 
-4. Install the dependencies using Composer:
+3. Then Start the app running the following script
 
 ```bash
-composer install
-```
-
-5. Start the Docker containers using Laravel Sail:
-```bash
-./vendor/bin/sail up
-```
-
-6. Generate an application key:
-```bash
-./vendor/bin/sail artisan key:generate
-```
-7. Migrate the database:
-```bash
-./vendor/bin/sail artisan migrate
-```
-8.Seed the database:
-```bash
-./vendor/bin/sail artisan db:seed
+bash setup/start_app.sh
 ```
 
 ### Usage
 
 Once the Docker containers are up and running, you can access the application in your web browser at http://localhost. From there, you can perform searches on google and view the results.
 
+```bash
+The default port for this application is 80. If you want to start the application on another port set  APP_PORT="YOUR PORT" in .env
+```
 ### Testing
 
 You can run the automated tests for the application using PHPUnit. To run the tests, use the following command:
