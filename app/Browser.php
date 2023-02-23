@@ -35,7 +35,7 @@ class Browser
             return RemoteWebDriver::create($this->seleniumServerUrl, $this->capabilities);
         } catch (\Exception $exception) {
             Log::error("Error while starting Chrome driver " . $exception->getMessage());
-            throw new ChromeDriverException("Error while starting Chrome driver ", $exception);
+            throw new ChromeDriverException("Error while starting Chrome driver " .  $exception->getMessage());
         }
     }
 }
