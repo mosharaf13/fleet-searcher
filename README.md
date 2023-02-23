@@ -8,7 +8,7 @@ fleet-searcher is a web application that allows you to search google using a CSV
 
 - Docker and Docker Compose
 - Composer
-- PHP 8 with the following extensions: pdo, pdo_mysql, mbstring, tokenizer, xml, curl
+- PHP 8 with common extensions
 - Node.js and npm
 
 ### Installation
