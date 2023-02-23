@@ -42,7 +42,7 @@ class GoogleSearcher implements Searcher
     {
         $this->driver->get($url . urlencode($keyword));
 
-        $this->driver->wait()->until(
+        $this->driver->wait(5)->until(
             WebDriverExpectedCondition::visibilityOfElementLocated(WebDriverBy::id('result-stats'))
         );
     }
