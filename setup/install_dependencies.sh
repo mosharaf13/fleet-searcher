@@ -5,7 +5,7 @@ sudo apt-get update
 sudo apt-get install curl php-cli php-mbstring git unzip
 
 # Install PHP 8 and the required extensions
-sudo apt-get install php-common php-mysql php-mbstring php-xml php-zip
+sudo apt-get install php-common php-mbstring php-xml php-zip
 sudo apt install php-curl php-dom php-xml php-simplexml
 
 # Install Composer
