@@ -30,30 +30,10 @@ cd fleet-searcher
 bash setup/install_dependencies.sh
 ```
 
-3. Copy the .env.example file to .env:
+3. Then Start the app running the following script
 
 ```bash
-cp .env.example .env
-```
-
-4. Install the dependencies using Composer:
-
-```bash
-composer install
-```
-
-5. Start the Docker containers using Laravel Sail:
-```bash
-./vendor/bin/sail up
-```
-
-6. Generate an application key:
-```bash
-./vendor/bin/sail artisan key:generate
-```
-7. Migrate the database:
-```bash
-./vendor/bin/sail artisan migrate
+bash setup/start_app.sh
 ```
 
 ### Usage
