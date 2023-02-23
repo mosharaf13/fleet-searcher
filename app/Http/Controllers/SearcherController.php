@@ -6,6 +6,7 @@ use App\Browser;
 use App\Contracts\FileInputParser;
 use App\Contracts\Searcher;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class SearcherController extends Controller
@@ -37,15 +38,23 @@ class SearcherController extends Controller
             $url = 'https://www.google.com/search?hl=en&q=';
 
             foreach (array_chunk($keywords, 10) as $keywordsChunk) {
-
-                $driver = $this->browser->getDriver();
-                $this->searcher->search($url, $driver, $keywordsChunk);
-                $driver->quit();
+                $this->searchChunk($url, $keywordsChunk);
             }
             return response()->json("Keywords uploaded successfully");
         } catch (\Exception $exception) {
             return response()->json(['error' => $exception->getMessage()], 400);
         }
 
+    }
+
+    private function searchChunk($url, $keywordsChunk)
+    {
+        try {
+            $driver = $this->browser->getDriver();
+            $this->searcher->search($url, $driver, $keywordsChunk);
+            $driver->quit();
+        } catch (\Exception $exception) {
+            Log::error("Exception happened while searching these keywords " . json_encode($keywordsChunk) . $exception->getMessage());
+        }
     }
 }
