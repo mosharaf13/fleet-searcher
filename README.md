@@ -26,11 +26,13 @@ cd fleet-searcher
 ```
 
 3. If you don't have the dependencies installed. Run the following command
+
 ```bash
 bash setup/install_dependencies.sh
 ```
 
-3. Then Start the app running the following script
+4. Logout and log back in to the terminal.
+5. Then Start the app running the following script
 
 ```bash
 bash setup/start_app.sh
@@ -38,11 +40,13 @@ bash setup/start_app.sh
 
 ### Usage
 
-Once the Docker containers are up and running, you can access the application in your web browser at http://localhost. From there, you can perform searches on google and view the results.
+Once the Docker containers are up and running, you can access the application in your web browser at http://localhost.
+From there, you can perform searches on google and view the results.
 
 ```bash
 The default port for this application is 80. If you want to start the application on another port set  APP_PORT="YOUR PORT" in .env
 ```
+
 ### Testing
 
 You can run the automated tests for the application using PHPUnit. To run the tests, use the following command:
