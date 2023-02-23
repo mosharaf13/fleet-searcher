@@ -46,46 +46,45 @@
                 <div class="row m-1">
                     <div class="card my-2">
                         <div class="card-header">Search Stats</div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                    <tr>
-                                        <th>Searched On</th>
-                                        <th>Keyword</th>
-                                        <th class="text-center">Total Ads</th>
-                                        <th class="text-center">Total Links</th>
-                                        <th class="text-center">Total Search Results</th>
-                                        <th>Raw View</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr v-for="searchStat in searchStats.data" :key="searchStat.id">
-                                        <td>{{ searchStat.created_at }}</td>
-                                        <td>{{ searchStat.keyword }}</td>
-                                        <td class="text-center">{{ searchStat.ads_count }}</td>
-                                        <td class="text-center">{{ searchStat.links_count }}</td>
-                                        <td class="text-center">{{ searchStat.total_result_count }}</td>
-                                        <!--                                <td>{{ searchStat.raw_response }}</td>-->
-                                        <td>
-                                            <button @click=fetchResponse(searchStat.id) type="button"
-                                                    class="btn btn-link btn-sm">Download
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                                <nav aria-label="Page navigation" class="overflow-auto">
-                                    <ul class="pagination justify-content-start flex-wrap">
-                                        <li class="page-item m-1" v-for="page in searchStats.links" :key="page.label"
-                                            :class="{active: page.active}">
-                                            <a class="page-link" @click.prevent="search(page.url)" href="#">
-                                                <span v-html="page.label"></span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </nav>
-                            </div>
+                        <div class="card-body table-responsive-sm">
+                            <table class="table ">
+                                <thead>
+                                <tr>
+                                    <th class="col-date">Searched On</th>
+                                    <th class="col-keyword">Keyword</th>
+                                    <th class="col text-center">Total Ads</th>
+                                    <th class="col text-center">Total Links</th>
+                                    <th class="col text-center">Total Search Results</th>
+                                    <th class="col">Raw View</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="searchStat in searchStats.data" :key="searchStat.id">
+                                    <td>{{ searchStat.created_at }}</td>
+                                    <td>{{ searchStat.keyword }}</td>
+                                    <td class="text-center">{{ searchStat.ads_count }}</td>
+                                    <td class="text-center">{{ searchStat.links_count }}</td>
+                                    <td class="text-center">{{ searchStat.total_result_count }}</td>
+                                    <!--                                <td>{{ searchStat.raw_response }}</td>-->
+                                    <td>
+                                        <button @click=fetchResponse(searchStat.id) type="button"
+                                                class="btn btn-link btn-sm">Download
+                                        </button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <nav aria-label="Page navigation" class="overflow-auto">
+                                <ul class="pagination justify-content-start flex-wrap">
+                                    <li class="page-item m-1" v-for="page in searchStats.links" :key="page.label"
+                                        :class="{active: page.active}">
+                                        <a class="page-link" @click.prevent="search(page.url)" href="#">
+                                            <span v-html="page.label"></span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+
                         </div>
                     </div>
                 </div>
