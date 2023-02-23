@@ -7,10 +7,10 @@ cp .env.example .env
 composer install
 
 # Start the Docker environment using Laravel Sail
-./vendor/bin/sail up -d
+sudo ../vendor/bin/sail up -d
 
 # Generate a new application key
-./vendor/bin/sail artisan key:generate
+sudo ../vendor/bin/sail artisan key:generate
 
 # Run the database migrations to set up the database schema
-./vendor/bin/sail artisan migrate
+sudo ../vendor/bin/sail artisan migrate
