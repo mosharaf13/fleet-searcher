@@ -131,8 +131,7 @@ export default {
                     search(url);
                 })
                 .catch(error => {
-                    // Handle any errors
-                    console.error(error);
+                    alert.value = error.response.data.error;
                 });
         }
 

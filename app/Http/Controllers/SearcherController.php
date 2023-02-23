@@ -32,16 +32,20 @@ class SearcherController extends Controller
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()], 400);
         }
+        try {
+            $keywords = $this->fileInputParser->parse($request->file('keywords'));
+            $url = 'https://www.google.com/search?hl=en&q=';
 
-        $keywords = $this->fileInputParser->parse($request->file('keywords'));
-        $url = 'https://www.google.com/search?hl=en&q=';
+            foreach (array_chunk($keywords, 10) as $keywordsChunk) {
 
-        foreach (array_chunk($keywords, 10) as $keywordsChunk) {
-
-            $driver = $this->browser->getDriver();
-            $this->searcher->search($url, $driver, $keywordsChunk);
-            $driver->quit();
+                $driver = $this->browser->getDriver();
+                $this->searcher->search($url, $driver, $keywordsChunk);
+                $driver->quit();
+            }
+            return response()->json("Keywords uploaded successfully");
+        } catch (\Exception $exception) {
+            return response()->json(['error' => $exception->getMessage()], 400);
         }
-        return response()->json("Keywords uploaded successfully");
+
     }
 }
