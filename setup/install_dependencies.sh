@@ -29,6 +29,7 @@ sudo chmod +x /usr/local/bin/docker-compose
 
 # Add user to the docker group to avoid running docker with sudo
 sudo usermod -aG docker $USER
+source ~/.bashrc
 
 # Verify the installations
 php -v
