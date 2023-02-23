@@ -16,3 +16,7 @@ composer install
 
 # Run the database migrations to set up the database schema
 ./vendor/bin/sail artisan migrate
+
+# Build assets
+npm install
+npm run build
