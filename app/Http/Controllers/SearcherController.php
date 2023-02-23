@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Browser;
 use App\Contracts\FileInputParser;
 use App\Contracts\Searcher;
+use Facebook\WebDriver\Exception\PhpWebDriverExceptionInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -49,12 +50,17 @@ class SearcherController extends Controller
 
     private function searchChunk($url, $keywordsChunk)
     {
+        $driver = null;
         try {
             $driver = $this->browser->getDriver();
             $this->searcher->search($url, $driver, $keywordsChunk);
-            $driver->quit();
         } catch (\Exception $exception) {
             Log::error("Exception happened while searching these keywords " . json_encode($keywordsChunk) . $exception->getMessage());
+            if($exception instanceof PhpWebDriverExceptionInterface){
+                $driver->quit();
+            }
+            sleep(2);
         }
+
     }
 }
