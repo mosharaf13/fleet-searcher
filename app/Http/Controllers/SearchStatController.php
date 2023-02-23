@@ -24,7 +24,8 @@ class SearchStatController extends Controller
         }
 
         return response()->json(
-            $searchStat->orderBy('created_at', 'desc')
+            $searchStat->select(SearchStat::MASS_RETURN_ATTRIBUTES)
+                ->orderBy('created_at', 'desc')
                 ->paginate($this->paginationSize)
         );
     }
