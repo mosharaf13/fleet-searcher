@@ -4,6 +4,8 @@
 sudo chgrp -R www-data storage bootstrap/cache
 sudo chmod -R ug+rwx storage bootstrap/cache
 
+git config core.fileMode false
+
 # Create a copy of the example environment file
 cp .env.example .env
 
