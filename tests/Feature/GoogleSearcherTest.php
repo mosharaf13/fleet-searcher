@@ -6,6 +6,7 @@ use App\Browser;
 use App\Events\SearchStatGenerated;
 use App\Models\User;
 use App\Searchers\GoogleSearcher;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
@@ -15,6 +16,7 @@ use Symfony\Component\Process\Process;
 
 class GoogleSearcherTest extends TestCase
 {
+    use RefreshDatabase;
 
     protected function setUp(): void
     {
