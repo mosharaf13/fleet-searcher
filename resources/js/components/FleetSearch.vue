@@ -8,23 +8,7 @@
                     </div>
                     <div class="row m-0 p-0 gap-2">
                         <upload-form @file-uploaded="search(url)"></upload-form>
-                        <div class="card col-md-5 mb-2 ">
-                            <div class="card-header">
-                                Filters
-                            </div>
-                            <div class="card-body">
-                                <div class="input-group">
-                                    <input type="text" v-model="keyword" class="form-control"
-                                           placeholder="Enter a keyword"
-                                           aria-label="Enter a keyword" aria-describedby="button-search"
-                                           @keyup.enter="search(url)"/>
-                                    <button @click="search(url)" class="btn btn-primary" type="button"
-                                            id="button-search">
-                                        Search
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        <search-form @search="handleSearch"></search-form>
                     </div>
                 </div>
                 <div class="row m-1">
@@ -78,19 +62,20 @@
 </template>
 
 <script>
-import {ref, onMounted, computed} from 'vue';
+import {ref, onMounted} from 'vue';
 import axios from 'axios';
 import UploadForm from "./partials/UploadForm.vue";
+import SearchForm from "./partials/SearchForm.vue";
 
 export default {
     name: 'FleetSearch',
     components: {
-        UploadForm
+        UploadForm,
+        SearchForm
     },
     setup() {
         let keyword = ref('');
         let searchStats = ref([]);
-        let fileInput = ref(null);
         let alert = ref('');
         const url = '/search-stats';
 
@@ -110,26 +95,14 @@ export default {
             }
         };
 
-        function submitForm() {
-            alert.value = "Please wait while we Fetch your results. You will see uploaded keywords once search for all keywords are complete";
-            const formData = new FormData();
-            formData.append('keywords', fileInput.value);
-            axios.post('/keywords', formData)
-                .then(response => {
-                    search(url);
-                })
-                .catch(error => {
-                    alert.value = error.response.data.error;
-                });
-        }
-
-        const canSubmit = computed(() => {
-            return fileInput.value;
-        });
-
-        function onFileChange(event) {
-            fileInput.value = event.target.files[0];
-        }
+        const handleSearch = async (query) => {
+            try {
+                keyword.value = query.value;
+                await search(url);
+            } catch (error) {
+                console.error(error);
+            }
+        };
 
         const fetchResponse = async (id) => {
             try {
@@ -154,12 +127,9 @@ export default {
             keyword,
             searchStats,
             search,
-            submitForm,
-            canSubmit,
-            onFileChange,
-            fileInput,
             fetchResponse,
-            alert
+            alert,
+            handleSearch
         };
     },
 

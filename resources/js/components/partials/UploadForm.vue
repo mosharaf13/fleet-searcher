@@ -19,17 +19,15 @@
 </template>
 
 <script>
-import {ref, onMounted, computed} from 'vue';
+import {ref, computed} from 'vue';
 import axios from 'axios';
 
 export default {
-    name: 'FleetSearch',
+    name: 'UploadForm',
     emits: ['file-uploaded'],
     setup(_, {emit}) {
         let fileInput = ref(null);
         let alert = ref('');
-
-
 
         function submitForm() {
             alert.value = "Please wait while we Fetch your results. You will see uploaded keywords once search for all keywords are complete";
@@ -51,7 +49,6 @@ export default {
         function onFileChange(event) {
             fileInput.value = event.target.files[0];
         }
-
 
         return {
             submitForm,
