@@ -49,7 +49,8 @@ class SearchStat extends Model
         parent::boot();
 
         static::addGlobalScope('age', function (Builder $builder) {
-            $builder->where('user_id', Auth::id());
+            $builder->where('user_id', Auth::id())
+                ->where('scrap_status', static::SCRAP_STATUS_COMPLETED);
         });
     }
 
