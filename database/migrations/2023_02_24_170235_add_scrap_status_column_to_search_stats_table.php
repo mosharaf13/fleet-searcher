@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        //todo Add string value for scrap status. so that many statuses can be saved
         Schema::table('search_stats', function (Blueprint $table) {
             $table->boolean('scrap_status')->default(false);
         });

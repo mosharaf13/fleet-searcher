@@ -12,6 +12,10 @@ class SearchStat extends Model
 {
     use HasFactory;
 
+    const SCRAP_STATUS_INITIALIZED = 'initialized';
+    const SCRAP_STATUS_RUNNING = 'running';
+    const SCRAP_STATUS_COMPLETED = 'completed';
+
     protected $casts = [
         'created_at' => 'datetime:Y-m-d h:i a',
         'updated_at' => 'datetime:Y-m-d h:i a',
