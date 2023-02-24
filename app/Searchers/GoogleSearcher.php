@@ -14,18 +14,26 @@ use Illuminate\Support\Facades\Log;
 class GoogleSearcher implements Searcher
 {
     protected WebDriver $driver;
-    protected $host = 'www.google.com';
+    protected string $host = 'www.google.com';
+
+    /**
+     * @param string $url
+     */
+    public function __construct(protected string $url = 'https://www.google.com/search?hl=en&q=')
+    {
+    }
+
 
     /**
      * @param WebDriver $driver
      * @param array $keywords
      * @return void
      */
-    public function search(string $url, WebDriver $driver, array $keywords): void
+    public function search(WebDriver $driver, array $keywords): void
     {
         $this->driver = $driver;
         foreach ($keywords as $keyword) {
-            $this->performSearch($url, $keyword);
+            $this->performSearch($keyword);
 
             SearchStatGenerated::dispatch(
                 $keyword,
@@ -38,9 +46,9 @@ class GoogleSearcher implements Searcher
         }
     }
 
-    private function performSearch(string $url, string $keyword): void
+    private function performSearch(string $keyword): void
     {
-        $this->driver->get($url . urlencode($keyword));
+        $this->driver->get($this->url . urlencode($keyword));
 
         $this->driver->wait(5)->until(
             WebDriverExpectedCondition::visibilityOfElementLocated(WebDriverBy::id('result-stats'))

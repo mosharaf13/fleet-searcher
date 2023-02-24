@@ -36,10 +36,9 @@ class SearcherController extends Controller
         }
         try {
             $keywords = $this->fileInputParser->parse($request->file('keywords'));
-            $url = 'https://www.google.com/search?hl=en&q=';
 
             foreach (array_chunk($keywords, 10) as $keywordsChunk) {
-                $this->searchChunk($url, $keywordsChunk);
+                $this->searchChunk($keywordsChunk);
             }
             return response()->json("Keywords uploaded successfully");
         } catch (\Exception $exception) {
@@ -48,12 +47,12 @@ class SearcherController extends Controller
 
     }
 
-    private function searchChunk($url, $keywordsChunk)
+    private function searchChunk($keywordsChunk)
     {
         $driver = null;
         try {
             $driver = $this->browser->getDriver();
-            $this->searcher->search($url, $driver, $keywordsChunk);
+            $this->searcher->search($driver, $keywordsChunk);
         } catch (\Exception $exception) {
             Log::error("Exception happened while searching these keywords " . json_encode($keywordsChunk) . $exception->getMessage());
             if($exception instanceof PhpWebDriverExceptionInterface){

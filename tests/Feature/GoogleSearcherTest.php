@@ -46,8 +46,8 @@ class GoogleSearcherTest extends TestCase
 
         $url = 'http://host.docker.internal:8800/';
 
-        $search = new GoogleSearcher();
-        $search->search($url, $driver, $keywords);
+        $search = new GoogleSearcher($url);
+        $search->search($driver, $keywords);
 
         foreach ($keywords as $keyword) {
             Event::assertDispatched(SearchStatGenerated::class, function ($event) use ($keyword) {
@@ -66,8 +66,8 @@ class GoogleSearcherTest extends TestCase
 
         $keywords = ['cheap flights'];
         $url = 'http://host.docker.internal:8800/';
-        $searcher = new GoogleSearcher();
-        $searcher->search($url, $driver, $keywords);
+        $searcher = new GoogleSearcher($url);
+        $searcher->search($driver, $keywords);
 
         foreach ($keywords as $keyword) {
             Event::assertDispatched(SearchStatGenerated::class, function ($event) use ($keyword) {
