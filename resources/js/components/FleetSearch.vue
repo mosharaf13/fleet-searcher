@@ -7,7 +7,7 @@
                         <div v-if="alert" class="alert alert-primary">{{ alert }}</div>
                     </div>
                     <div class="row m-0 p-0 gap-2">
-                        <upload-form @file-uploaded="search(url)"></upload-form>
+                        <upload-form @file-upload-started="showAlert" @file-uploaded="search(url)"></upload-form>
                         <search-form @search="handleSearch"></search-form>
                     </div>
                 </div>
@@ -76,7 +76,7 @@ export default {
     setup() {
         let keyword = ref('');
         let searchStats = ref([]);
-        let alert = ref('');
+        let alertText = ref('');
         const url = '/search-stats';
 
         onMounted(() => {
@@ -89,7 +89,7 @@ export default {
                     params: {keyword: keyword.value}
                 });
                 searchStats.value = response.data;
-                alert.value = "";
+                alertText.value = "";
             } catch (error) {
                 console.error(error);
             }
@@ -121,6 +121,10 @@ export default {
             }
         };
 
+        const showAlert = async (alertMessage) => {
+            alertText.value = alertMessage.value;
+        }
+
 
         return {
             url,
@@ -128,8 +132,9 @@ export default {
             searchStats,
             search,
             fetchResponse,
-            alert,
-            handleSearch
+            alert: alertText,
+            handleSearch,
+            showAlert
         };
     },
 
