@@ -2,45 +2,110 @@
 
 namespace App\Searchers;
 
+use App\Browser;
 use App\Contracts\Searcher;
+use App\Events\KeywordsForScrappingFound;
 use App\Events\SearchStatGenerated;
 use App\Models\SearchStat;
+use Facebook\WebDriver\Exception\PhpWebDriverExceptionInterface;
 use Facebook\WebDriver\WebDriver;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverExpectedCondition;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
-class GoogleSearcher implements Searcher
+class GoogleSearcher implements Searcher, ShouldQueue
 {
+    use InteractsWithQueue;
+
     protected WebDriver $driver;
     protected $host = 'www.google.com';
 
     /**
-     * @param WebDriver $driver
-     * @param array $keywords
+     * The number of times the queued listener may be attempted.
+     *
+     * @var int
+     */
+    public $tries = 3;
+
+    /**
+     * Calculate the number of seconds to wait before retrying the job.
+     *
+     * @return array<int, int>
+     */
+    public function backoff(): array
+    {
+        return [10, 10, 15];
+    }
+
+
+    public function __construct(private Browser $browser, private string $url = 'https://www.google.com/search?hl=en&q=')
+    {
+
+    }
+
+    /**
+     * Handle the event.
+     */
+    public function handle(KeywordsForScrappingFound $event): void
+    {
+        sleep(1);
+        $this->driver = $this->browser->getDriver();
+        Log::debug("Driver created successfully");
+        $this->search($event->searchStats);
+
+        $this->driver->quit();
+    }
+
+    /**
+     * Handle a job failure.
+     */
+    public function failed(KeywordsForScrappingFound $event, Throwable $exception): void
+    {
+        $keywords = array_map(function (SearchStat $searchStat) {
+            return $searchStat->keyword;
+        }, $event->searchStats);
+        Log::error(
+            "Exception happened while searching these keywords " .
+            json_encode($keywords) . $exception->getMessage()
+        );
+
+        if ($exception instanceof PhpWebDriverExceptionInterface) {
+            $this->driver->quit();
+        }
+    }
+
+    /**
+     * @param SearchStat[] $searchStats
      * @return void
      */
-    public function search(string $url, WebDriver $driver, array $keywords): void
+    public function search(array $searchStats): void
     {
-        $this->driver = $driver;
-        foreach ($keywords as $keyword) {
-            $this->performSearch($url, $keyword);
+        foreach ($searchStats as $searchStat) {
+            $this->performSearch($searchStat);
 
             SearchStatGenerated::dispatch(
-                $keyword,
+                $searchStat,
                 $this->countAds(),
                 $this->countLinks(),
                 $this->extractTotalNumberOfResults(),
-                $this->getRawResponse(),
-                Auth::id()
+                $this->getRawResponse()
             );
         }
     }
 
-    private function performSearch(string $url, string $keyword): void
+    /**
+     * @param SearchStat $searchStat
+     * @return void
+     * @throws \Facebook\WebDriver\Exception\NoSuchElementException
+     * @throws \Facebook\WebDriver\Exception\TimeoutException
+     */
+    private function performSearch(SearchStat $searchStat): void
     {
-        $this->driver->get($url . urlencode($keyword));
+        $this->driver->get($this->url . urlencode($searchStat->keyword));
 
         $this->driver->wait(5)->until(
             WebDriverExpectedCondition::visibilityOfElementLocated(WebDriverBy::id('result-stats'))

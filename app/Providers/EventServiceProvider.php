@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Events\KeywordsForScrappingFound;
 use App\Events\SearchStatGenerated;
 use App\Listeners\StoreSearchStatOnDb;
+use App\Searchers\GoogleSearcher;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -22,6 +24,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         SearchStatGenerated::class => [
             StoreSearchStatOnDb::class
+        ],
+        KeywordsForScrappingFound::class => [
+            GoogleSearcher::class
         ]
     ];
 
