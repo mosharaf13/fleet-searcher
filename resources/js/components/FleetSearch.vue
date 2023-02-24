@@ -7,23 +7,7 @@
                         <div v-if="alert" class="alert alert-primary">{{ alert }}</div>
                     </div>
                     <div class="row m-0 p-0 gap-2">
-                        <div class="card col-md-5 mb-2 ">
-                            <div class="card-header">
-                                Upload a CSV file. Maximum 100 keywords allowed.
-
-                            </div>
-                            <div class="card-body">
-                                <form @submit.prevent="submitForm" class="mb-3">
-                                    <div class="input-group mb-3">
-                                        <input type="file" id="csvFile" class="form-control" accept=".csv"
-                                               @change="onFileChange"/>
-                                        <button type="submit" :disabled="!canSubmit" class="btn btn-primary">
-                                            Upload
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
+                        <upload-form @file-uploaded="search(url)"></upload-form>
                         <div class="card col-md-5 mb-2 ">
                             <div class="card-header">
                                 Filters
@@ -96,9 +80,13 @@
 <script>
 import {ref, onMounted, computed} from 'vue';
 import axios from 'axios';
+import UploadForm from "./partials/UploadForm.vue";
 
 export default {
     name: 'FleetSearch',
+    components: {
+        UploadForm
+    },
     setup() {
         let keyword = ref('');
         let searchStats = ref([]);
