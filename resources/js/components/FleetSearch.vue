@@ -67,8 +67,8 @@
                                     <td class="text-center">{{ searchStat.total_result_count }}</td>
                                     <!--                                <td>{{ searchStat.raw_response }}</td>-->
                                     <td>
-                                        <button @click=fetchResponse(searchStat.id) type="button"
-                                                class="btn btn-link btn-sm">Download
+                                        <button @click=showRawView(searchStat.id) type="button"
+                                                class="btn btn-link btn-sm">View
                                         </button>
                                     </td>
                                 </tr>
@@ -105,6 +105,7 @@ export default {
         let fileInput = ref(null);
         let alert = ref('');
         const url = '/search-stats';
+        const appUrl = process.env.APP_URL;
 
         onMounted(() => {
             search(url);
@@ -143,23 +144,15 @@ export default {
             fileInput.value = event.target.files[0];
         }
 
-        const fetchResponse = async (id) => {
+        const showRawView = async (id) => {
             try {
-                const response = await axios.get(`/raw-response/${id}`, {
-                    responseType: 'blob'
-                });
-                const data = response.data;
-                const fileUrl = window.URL.createObjectURL(new Blob([data]));
-                const link = document.createElement('a');
-                link.href = fileUrl;
-                link.setAttribute('download', 'response.html');
-                document.body.appendChild(link);
-                link.click();
+                const url = `${appUrl}/raw-response/${id}`;
+                const newWindow = window.open(url, '_blank');
+                newWindow.focus();
             } catch (error) {
                 console.error(error);
             }
         };
-
 
         return {
             url,
@@ -170,7 +163,7 @@ export default {
             canSubmit,
             onFileChange,
             fileInput,
-            fetchResponse,
+            showRawView,
             alert
         };
     },

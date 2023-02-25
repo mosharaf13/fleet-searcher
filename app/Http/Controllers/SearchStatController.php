@@ -58,8 +58,8 @@ class SearchStatController extends Controller
 
     public function rawResponse($id)
     {
-        return response()->json(
-            SearchStat::findOrFail($id)->raw_response
-        );
+        return response()->view('raw_response',[
+            'content' => SearchStat::findOrFail($id)->raw_response
+        ]);
     }
 }
