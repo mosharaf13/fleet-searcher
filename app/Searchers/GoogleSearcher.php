@@ -65,6 +65,7 @@ class GoogleSearcher implements Searcher, ShouldQueue
      */
     public function failed(KeywordsForScrappingFound $event, Throwable $exception): void
     {
+        $this->updateSearchStatScrapStatus($event->searchStats);
         $keywords = array_map(function (SearchStat $searchStat) {
             return $searchStat->keyword;
         }, $event->searchStats);
@@ -75,6 +76,14 @@ class GoogleSearcher implements Searcher, ShouldQueue
 
         if ($exception instanceof PhpWebDriverExceptionInterface) {
             $this->driver->quit();
+        }
+    }
+
+    private function updateSearchStatScrapStatus(array $searchStats)
+    {
+        foreach ($searchStats as $searchStat){
+            $searchStat->scrap_status = SearchStat::SCRAP_STATUS_FAILED;
+            $searchStat->save();
         }
     }
 
