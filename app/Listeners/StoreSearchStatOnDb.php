@@ -17,13 +17,11 @@ class StoreSearchStatOnDb
      */
     public function handle(SearchStatGenerated $event): void
     {
-        SearchStat::create([
-            'keyword' => $event->keyword,
-            'ads_count' => $event->adsCount,
-            'links_count' => $event->linksCount,
-            'total_result_count' => $event->searchCount,
-            'raw_response' => $event->rawResponse,
-            'user_id' => $event->user_id
-        ]);
+        $event->keyword->ads_count = $event->adsCount;
+        $event->keyword->links_count = $event->linksCount;
+        $event->keyword->total_result_count = $event->searchCount;
+        $event->keyword->raw_response = $event->rawResponse;
+        $event->keyword->scrap_status = SearchStat::SCRAP_STATUS_COMPLETED;
+        $event->keyword->save();
     }
 }

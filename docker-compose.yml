@@ -12,7 +12,7 @@ services:
         ports:
             - '${APP_PORT:-80}:80'
             - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
-            - "8800:8800"
+            - '8800:8800'
         environment:
             WWWUSER: '${WWWUSER}'
             LARAVEL_SAIL: 1
@@ -25,6 +25,7 @@ services:
         depends_on:
             - pgsql
             - chromedriver
+            - redis
     pgsql:
         image: 'postgres:15'
         ports:
@@ -53,15 +54,32 @@ services:
     chromedriver:
         image: selenium/standalone-chrome-debug
         ports:
-            - "4444:4444"
-            - "5900:5900"
+            - '4444:4444'
+            - '5900:5900'
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         networks:
             - fleet-searcher
+    redis:
+        image: 'redis:alpine'
+        ports:
+            - '${FORWARD_REDIS_PORT:-6379}:6379'
+        volumes:
+            - 'sail-redis:/data'
+        networks:
+            - fleet-searcher
+        healthcheck:
+            test:
+                - CMD
+                - redis-cli
+                - ping
+            retries: 3
+            timeout: 5s
 networks:
     fleet-searcher:
         driver: bridge
 volumes:
     fleet-searcher-pgsql:
+        driver: local
+    sail-redis:
         driver: local

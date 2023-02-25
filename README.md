@@ -37,6 +37,11 @@ bash setup/install_dependencies.sh
 ```bash
 bash setup/start_app.sh
 ```
+6. Then allow jobs to start processing locally run
+```bash
+./vendor/bin/sail artisan horizon
+```
+You can use supervisor to run this as a background process
 
 ### Usage
 

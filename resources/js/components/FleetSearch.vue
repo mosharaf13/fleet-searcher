@@ -7,40 +7,8 @@
                         <div v-if="alert" class="alert alert-primary">{{ alert }}</div>
                     </div>
                     <div class="row m-0 p-0 gap-2">
-                        <div class="card col-md-5 mb-2 ">
-                            <div class="card-header">
-                                Upload a CSV file. Maximum 100 keywords allowed.
-
-                            </div>
-                            <div class="card-body">
-                                <form @submit.prevent="submitForm" class="mb-3">
-                                    <div class="input-group mb-3">
-                                        <input type="file" id="csvFile" class="form-control" accept=".csv"
-                                               @change="onFileChange"/>
-                                        <button type="submit" :disabled="!canSubmit" class="btn btn-primary">
-                                            Upload
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                        <div class="card col-md-5 mb-2 ">
-                            <div class="card-header">
-                                Filters
-                            </div>
-                            <div class="card-body">
-                                <div class="input-group">
-                                    <input type="text" v-model="keyword" class="form-control"
-                                           placeholder="Enter a keyword"
-                                           aria-label="Enter a keyword" aria-describedby="button-search"
-                                           @keyup.enter="search(url)"/>
-                                    <button @click="search(url)" class="btn btn-primary" type="button"
-                                            id="button-search">
-                                        Search
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        <upload-form @file-upload-started="showAlert" @file-uploaded="handleFileUpload"></upload-form>
+                        <search-form @search="handleSearch"></search-form>
                     </div>
                 </div>
                 <div class="row m-1">
@@ -56,6 +24,7 @@
                                     <th class="col text-center">Total Links</th>
                                     <th class="col text-center">Total Search Results</th>
                                     <th class="col">Raw View</th>
+                                    <th class="col">Search Completed</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -71,6 +40,9 @@
                                                 class="btn btn-link btn-sm">Download
                                         </button>
                                     </td>
+
+                                    <td  v-if="searchStat.scrap_status == 'completed'" class="text-center text-success">Yes</td>
+                                    <td  v-if="searchStat.scrap_status == 'failed'" class="text-center text-danger">No</td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -94,16 +66,27 @@
 </template>
 
 <script>
-import {ref, onMounted, computed} from 'vue';
+import {ref, onMounted} from 'vue';
 import axios from 'axios';
+import UploadForm from "./partials/UploadForm.vue";
+import SearchForm from "./partials/SearchForm.vue";
 
 export default {
     name: 'FleetSearch',
+    components: {
+        UploadForm,
+        SearchForm
+    },
     setup() {
         let keyword = ref('');
         let searchStats = ref([]);
-        let fileInput = ref(null);
-        let alert = ref('');
+        let alertText = ref('');
+        let fileContent = ref();
+        let keywords = ref();
+        const pollingIntervalMs = 5000;
+        let pollingIntervalId = null;
+        let pollingStartTime = null;
+
         const url = '/search-stats';
 
         onMounted(() => {
@@ -116,32 +99,20 @@ export default {
                     params: {keyword: keyword.value}
                 });
                 searchStats.value = response.data;
-                alert.value = "";
+                alertText.value = "";
             } catch (error) {
                 console.error(error);
             }
         };
 
-        function submitForm() {
-            alert.value = "Please wait while we Fetch your results. You will see uploaded keywords once search for all keywords are complete";
-            const formData = new FormData();
-            formData.append('keywords', fileInput.value);
-            axios.post('/keywords', formData)
-                .then(response => {
-                    search(url);
-                })
-                .catch(error => {
-                    alert.value = error.response.data.error;
-                });
-        }
-
-        const canSubmit = computed(() => {
-            return fileInput.value;
-        });
-
-        function onFileChange(event) {
-            fileInput.value = event.target.files[0];
-        }
+        const handleSearch = async (query) => {
+            try {
+                keyword.value = query.value;
+                await search(url);
+            } catch (error) {
+                console.error(error);
+            }
+        };
 
         const fetchResponse = async (id) => {
             try {
@@ -160,18 +131,72 @@ export default {
             }
         };
 
+        const showAlert = async (alertMessage) => {
+            alertText.value = alertMessage.value;
+        }
+
+        const handleFileUpload = async (fileContent) => {
+            try {
+                keywords.value = fileContent.value;
+                await startPolling();
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        const startPolling = async () => {
+            pollingStartTime = new Date();
+
+            pollingIntervalId = setInterval(async () => {
+                try {
+                    await search(url);
+                    if (ShouldStopPolling()) {
+                        stopPolling();
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            }, pollingIntervalMs);
+        }
+
+        const stopPolling = () => {
+            clearInterval(pollingIntervalId);
+            pollingIntervalId = null;
+        }
+
+        function ShouldStopPolling() {
+
+            let lastSubset = keywords.value.slice(-searchStats.value.per_page);
+            let searchStatKeywords = searchStats.value.data.map(data => data.keyword);
+
+            return lastSubset.every(keyword =>
+                    searchStatKeywords.includes(keyword)
+                ) && thirtySecondsHasPassedSincelastData(searchStats.value.data[0].updated_at, new Date())
+                && thirtySecondsHasPassedSinceInitialPolling();
+        }
+
+        function thirtySecondsHasPassedSincelastData(savedDateString, currentDate) {
+            let savedDate = new Date(savedDateString);
+            let secondsPassed = Math.abs(currentDate.getTime() - savedDate.getTime());
+            return secondsPassed > .5 * 60 * 1000;
+        }
+
+        function thirtySecondsHasPassedSinceInitialPolling() {
+            let currentDate = new Date();
+            let secondsPassed = Math.abs(currentDate.getTime() - pollingStartTime.getTime());
+            return secondsPassed > .5 * 60 * 1000;
+        }
 
         return {
             url,
             keyword,
             searchStats,
             search,
-            submitForm,
-            canSubmit,
-            onFileChange,
-            fileInput,
             fetchResponse,
-            alert
+            alert: alertText,
+            handleSearch,
+            showAlert,
+            handleFileUpload
         };
     },
 

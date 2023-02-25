@@ -3,13 +3,15 @@
 namespace Tests\Feature;
 
 use App\Browser;
+use App\Events\KeywordsForScrappingFound;
 use App\Events\SearchStatGenerated;
+use App\Models\SearchStat;
 use App\Models\User;
 use App\Searchers\GoogleSearcher;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 use Symfony\Component\Process\Process;
 
@@ -27,6 +29,7 @@ class GoogleSearcherTest extends TestCase
         $this->process = new Process(['php', '-S', '0.0.0.0:8800', '-t', __DIR__ . '/files']);
         $this->process->start();
         sleep(2);
+
     }
 
     protected function tearDown(): void
@@ -40,18 +43,24 @@ class GoogleSearcherTest extends TestCase
     {
         Event::fake();
 
-        $driver = (new Browser())->getDriver();
         sleep(5);
-        $keywords = ['empty'];
 
+        $searchStats = [
+            new SearchStat([
+                'keyword' => 'empty',
+                'scrap_status' => SearchStat::SCRAP_STATUS_INITIALIZED,
+                'user_id' => 1
+            ])
+        ];
+
+        $event = new KeywordsForScrappingFound($searchStats);
         $url = 'http://host.docker.internal:8800/';
+        $search = new GoogleSearcher(new Browser(), $url);
+        $search->handle($event);
 
-        $search = new GoogleSearcher();
-        $search->search($url, $driver, $keywords);
-
-        foreach ($keywords as $keyword) {
-            Event::assertDispatched(SearchStatGenerated::class, function ($event) use ($keyword) {
-                return $event->keyword === $keyword;
+        foreach ($searchStats as $searchStat) {
+            Event::assertDispatched(SearchStatGenerated::class, function ($event) use ($searchStat) {
+                return $event->keyword === $searchStat;
             });
         }
     }
@@ -61,17 +70,26 @@ class GoogleSearcherTest extends TestCase
         Event::fake();
 
         // Run the code that should dispatch the event
-        $driver = (new Browser())->getDriver();
         sleep(5);
 
-        $keywords = ['cheap flights'];
-        $url = 'http://host.docker.internal:8800/';
-        $searcher = new GoogleSearcher();
-        $searcher->search($url, $driver, $keywords);
 
-        foreach ($keywords as $keyword) {
-            Event::assertDispatched(SearchStatGenerated::class, function ($event) use ($keyword) {
-                return $event->keyword == $keyword
+        $searchStats = [
+            new SearchStat([
+                'keyword' => 'cheap flights',
+                'scrap_status' => SearchStat::SCRAP_STATUS_INITIALIZED,
+                'user_id' => 1
+            ]),
+        ];
+
+        $event = new KeywordsForScrappingFound($searchStats);
+
+        $url = 'http://host.docker.internal:8800/';
+        $searcher = new GoogleSearcher(new Browser(), $url);
+        $searcher->handle($event);
+
+        foreach ($searchStats as $searchStat) {
+            Event::assertDispatched(SearchStatGenerated::class, function ($event) use ($searchStat) {
+                return $event->keyword == $searchStat
                     && $event->adsCount == 3
                     && $event->linksCount == 52
                     && $event->searchCount == 265000000;
