@@ -15,6 +15,7 @@ class SearchStat extends Model
     const SCRAP_STATUS_INITIALIZED = 'initialized';
     const SCRAP_STATUS_RUNNING = 'running';
     const SCRAP_STATUS_COMPLETED = 'completed';
+    const SCRAP_STATUS_FAILED = 'failed';
 
     protected $casts = [
         'created_at' => 'datetime:Y-m-d h:i a',
@@ -36,8 +37,10 @@ class SearchStat extends Model
         'ads_count',
         'links_count',
         'total_result_count',
-        'created_at'
+        'created_at',
+        'updated_at'
     ];
+
 
     /**
      * The "booting" method of the model.
@@ -50,7 +53,10 @@ class SearchStat extends Model
 
         static::addGlobalScope('age', function (Builder $builder) {
             $builder->where('user_id', Auth::id())
-                ->where('scrap_status', static::SCRAP_STATUS_COMPLETED);
+                ->whereIn('scrap_status', [
+                    static::SCRAP_STATUS_COMPLETED,
+                    static::SCRAP_STATUS_FAILED
+                ]);
         });
     }
 
@@ -58,6 +64,7 @@ class SearchStat extends Model
     {
         return Carbon::parse($value)->diffForHumans();
     }
+
 
     public function user()
     {
