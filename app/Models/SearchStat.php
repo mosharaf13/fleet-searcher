@@ -38,7 +38,8 @@ class SearchStat extends Model
         'links_count',
         'total_result_count',
         'created_at',
-        'updated_at'
+        'updated_at',
+        'scrap_status'
     ];
 
 

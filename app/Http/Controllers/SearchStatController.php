@@ -24,7 +24,7 @@ class SearchStatController extends Controller
         }
 
         return response()->json(
-            $searchStat
+                $searchStat->select(SearchStat::MASS_RETURN_ATTRIBUTES)
                 ->orderBy('id', 'desc')
                 ->paginate($this->paginationSize)
         );
