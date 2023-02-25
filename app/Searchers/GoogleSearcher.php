@@ -4,17 +4,17 @@ namespace App\Searchers;
 
 use App\Contracts\Searcher;
 use App\Events\SearchStatGenerated;
-use App\Models\SearchStat;
+use App\Traits\ManipulatesDom;
 use Facebook\WebDriver\WebDriver;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverExpectedCondition;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\URL;
+
 
 class GoogleSearcher implements Searcher
 {
+    use ManipulatesDom;
+
     protected WebDriver $driver;
     protected $host = 'www.google.com';
 
@@ -82,6 +82,10 @@ class GoogleSearcher implements Searcher
         return str_replace(',', '', $matches[1]);
     }
 
+    /**
+     * return raw response after making all the relative urls absolute in the page
+     * @return string|null
+     */
     private function getRawResponse(): ?string
     {
         $url = $this->driver->getCurrentURL();
@@ -95,47 +99,11 @@ class GoogleSearcher implements Searcher
         $dom = new \DOMDocument();
         @$dom->loadHTML($this->driver->getPageSource());
 
-        // Loop through all <a> tags and convert their href attributes to absolute URLs
-        foreach ($dom->getElementsByTagName('a') as $a) {
-            $href = $a->getAttribute('href');
-            if (str_starts_with($href, 'xjs/') ||
-                (!filter_var($href, FILTER_VALIDATE_URL) &&
-                    !str_starts_with($href, '//'))) {
-
-                $absoluteUrl = $currentUrl . $href;
-                $a->setAttribute('href', $absoluteUrl);
-            }
-        }
-
-        // Loop through all <img> tags and convert their src attributes to absolute URLs
-        foreach ($dom->getElementsByTagName('img') as $img) {
-            $src = $img->getAttribute('src');
-            if(str_ends_with($src, '.webp')){
-                $absoluteUrl = $currentUrl . $src;
-                $img->setAttribute('src', $absoluteUrl);
-            }
-
-            if (!str_starts_with($src, 'data:') && !filter_var($src, FILTER_VALIDATE_URL) && !str_starts_with($src, '//')) {
-                $absoluteUrl = $currentUrl . $src;
-                $img->setAttribute('src', $absoluteUrl);
-            }
-        }
-
+        $this->changeHrefOfLinks($dom, $currentUrl);
+        $this->changeSrcOfImgs($dom, $currentUrl);
         $this->changeSrcAttributes('script', $dom, $currentUrl);
         $this->changeSrcAttributes('div', $dom, $currentUrl);
 
         return $dom->saveHTML();
     }
-
-    private function changeSrcAttributes($elementTagName, $dom, $currentUrl)
-    {
-        foreach ($dom->getElementsByTagName($elementTagName) as $img) {
-            $src = $img->getAttribute('src');
-            if (!filter_var($src, FILTER_VALIDATE_URL) && !str_starts_with($src, '//')) {
-                $absoluteUrl = $currentUrl . $src;
-                $img->setAttribute('src', $absoluteUrl);
-            }
-        }
-    }
-
 }
