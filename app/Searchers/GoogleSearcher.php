@@ -4,15 +4,17 @@ namespace App\Searchers;
 
 use App\Contracts\Searcher;
 use App\Events\SearchStatGenerated;
-use App\Models\SearchStat;
+use App\Traits\ManipulatesDom;
 use Facebook\WebDriver\WebDriver;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverExpectedCondition;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
+
 
 class GoogleSearcher implements Searcher
 {
+    use ManipulatesDom;
+
     protected WebDriver $driver;
     protected $host = 'www.google.com';
 
@@ -80,8 +82,27 @@ class GoogleSearcher implements Searcher
         return str_replace(',', '', $matches[1]);
     }
 
+    /**
+     * return raw response after making all the relative urls absolute in the page
+     * @return string|null
+     */
     private function getRawResponse(): ?string
     {
-        return $this->driver->getPageSource();
+        $url = $this->driver->getCurrentURL();
+        return $this->makeRelativeUrlsAbsolute(
+            parse_url($url, PHP_URL_SCHEME) . '://' . parse_url($url, PHP_URL_HOST)
+        );
+    }
+
+    private function makeRelativeUrlsAbsolute($currentUrl)
+    {
+        $dom = new \DOMDocument();
+        @$dom->loadHTML($this->driver->getPageSource());
+
+        $this->changeHrefOfLinks($dom, $currentUrl);
+        $this->changeSrcOfImgs($dom, $currentUrl);
+        $this->changeSrcAttributes('script', $dom, $currentUrl);
+
+        return $dom->saveHTML();
     }
 }
