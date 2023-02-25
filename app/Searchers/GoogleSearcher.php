@@ -102,7 +102,6 @@ class GoogleSearcher implements Searcher
         $this->changeHrefOfLinks($dom, $currentUrl);
         $this->changeSrcOfImgs($dom, $currentUrl);
         $this->changeSrcAttributes('script', $dom, $currentUrl);
-        $this->changeSrcAttributes('div', $dom, $currentUrl);
 
         return $dom->saveHTML();
     }
