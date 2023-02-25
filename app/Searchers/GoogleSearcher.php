@@ -54,7 +54,6 @@ class GoogleSearcher implements Searcher, ShouldQueue
     {
         sleep(1);
         $this->driver = $this->browser->getDriver();
-        Log::debug("Driver created successfully");
         $this->search($event->searchStats);
 
         $this->driver->quit();

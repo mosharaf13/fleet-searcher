@@ -146,7 +146,7 @@ export default {
 
         const startPolling = async () => {
             pollingStartTime = new Date();
-            console.log("starting to poll");
+
             pollingIntervalId = setInterval(async () => {
                 try {
                     await search(url);
@@ -168,8 +168,7 @@ export default {
 
             let lastSubset = keywords.value.slice(-searchStats.value.per_page);
             let searchStatKeywords = searchStats.value.data.map(data => data.keyword);
-            console.log("last subset is", lastSubset);
-            console.log("search stat keywords", searchStatKeywords);
+
             return lastSubset.every(keyword =>
                     searchStatKeywords.includes(keyword)
                 ) && thirtySecondsHasPassedSincelastData(searchStats.value.data[0].updated_at, new Date())
@@ -177,19 +176,13 @@ export default {
         }
 
         function thirtySecondsHasPassedSincelastData(savedDateString, currentDate) {
-            console.log('thirtySecondsHasPassedSincelastData');
             let savedDate = new Date(savedDateString);
-            console.log(currentDate.getTime(), savedDate.getTime());
-            console.log(currentDate.getTime() - savedDate.getTime() / 60 * 1000);
             let secondsPassed = Math.abs(currentDate.getTime() - savedDate.getTime());
             return secondsPassed > .5 * 60 * 1000;
         }
 
         function thirtySecondsHasPassedSinceInitialPolling() {
-            console.log('thirtySecondsHasPassedSinceInitialPolling');
             let currentDate = new Date();
-            console.log(currentDate.getTime(), pollingStartTime.getTime());
-            console.log(currentDate.getTime() - pollingStartTime.getTime() / 60 * 1000);
             let secondsPassed = Math.abs(currentDate.getTime() - pollingStartTime.getTime());
             return secondsPassed > .5 * 60 * 1000;
         }
